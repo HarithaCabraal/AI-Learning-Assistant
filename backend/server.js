@@ -45,6 +45,7 @@ app.use('./api/documents', documentRoutes);
 app.use('/api/flashcards', flashcardRoutes);
 app.use('/api/aiRoutes', aiRoutes);
 
+
 app.use(errorHandler);
 
 //404 handler
