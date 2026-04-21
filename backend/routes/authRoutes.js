@@ -19,7 +19,7 @@ const registerValidation = [
         .withMessage('Username must be at least 3 characters'),
     body('email')
         .isEmail()
-        .normalizedEmail()
+        .normalizeEmail()
         .withMessage('Please provide a valid email'),
     body('password')
         .isLength({ min: 6})
@@ -30,10 +30,10 @@ const loginValidation = [
     body('email')
         .isEmail()
         .normalizeEmail()
-        ,withMessage('Please provide a valid email'),
+        .withMessage('Please provide a valid email'),
     body('password')
         .notEmpty()
-        ,withMessage('Password is required')
+        .withMessage('Password is required')
 ];
 
 //Public routes 
