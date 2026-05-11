@@ -122,29 +122,148 @@ export const generateQuiz = async (req, res, next) => {
 };
 
 // @desc Generate document summary
-// @route POST /api/ai/generate-summmary
+// @route POST /api/ai/generate-summary
 // @access Private
 export const generateSummary = async (req, res, next) => {
+    try{
+        const { documentId } = req.body;
 
+        if (!documenntId) {
+            return res.status(400).json({
+                success: false,
+                error: 'PLease provide documentId',
+                statusCode: 400
+            });
+        }
+
+        const document = await Document.findOne({
+            _id: documentId,
+            userId: req.user._id,
+            status: 'ready'
+        });
+
+        if(!document) {
+            return res.status(404).json({
+                success: false,
+                error: 'Document not found or not ready',
+                statusCode: 404
+            });
+        }
+
+        //Generate summary using Gemini
+        const summary = await geminiService.generateSummary(document.extractedText);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                documentId: document._id,
+                title: document.title,
+                summary
+            },
+            message: 'Summary generated successfully'
+        });
+
+    } catch (error){
+        next(error)
+    }
 };
 
 // @desc Chat with document
 // @route POST /api/ai/chat
 // @access Private
 export const chat = async (req, res, next) => {
+    try{
+        const { documentId , question } = req.body;
 
+        if(!documentId || !question) {
+            return res.status(400).json({
+                sucess: false,
+                error: 'Please provide documentId and question',
+                statusCode: 400
+            });
+        }
+
+        const document = await Document.findOne({
+            _id: documentId,
+            userId: req.user._id,
+            status: 'ready'
+        });
+
+        if (!document) {
+            return res.status(404).json({
+                success: false,
+                error: 'Document not found or not ready',
+                statusCode: 404
+            });
+        }
+
+        //Find relevant chunks
+        const relevantChunks = findRelevantChunks(document.chunks, question, 3);
+        const chunkIndices = relevantChunks.map(c => c.chunkIndex);
+
+        //Get or create chat history
+        let chatHistory = await ChatHistory.findOne({
+            userId: req.user._id,
+            documentId: document._id
+        });
+
+        if (!chatHistory) {
+            chatHistory = await ChatHistory.create({
+                userId: req.user._id,
+                documentId: document._id,
+                messages: []
+            });
+        }
+
+        // Generate response using Gemini
+        const answer = await geminiService.chatWithContext(question, relevantChunks);
+
+        //Save conversation
+        chatHistory.messages.push(
+            {
+                role: 'user',
+                content: question,
+                timestamp: new Date(),
+                relevantChunks: chunkIndices
+            }
+        );
+
+        await chatHistory.save();
+
+        res.status(200).json({
+            success: true,
+            data: {
+                question,
+                answer,
+                relevantChunks: chunkIndices,
+                chatHistoryId: chatHistory._id
+            },
+            message: 'Response generated successfully' 
+        });
+
+    } catch (error){
+        next(error)
+    }
 };
 
 // @desc Explain concepts from document
 // @route POST /api/ai/explain-concept
 // @access Private
 export const explainConcept = async (req, res, next) => {
+    try{
 
+    } catch (error){
+        next(error)
+    }
 };
 
 // @desc Get chat history for a document
 // @route POST /api/ai/chat-history/:documentId
 // @access Private
 export const getChatHistory = async (req, res, next) => {
+    try{
 
+    } catch (error){
+        next(error)
+    }
 };
