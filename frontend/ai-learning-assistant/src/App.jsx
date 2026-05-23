@@ -5,11 +5,18 @@ import DocumentListPage from './pages/Documents/DocumentListPage';
 import DocumentDetailPage from './pages/Documents/DocumentDetailPage';
 import FlashcardList from './pages/Flashcards/FlashcardList';
 import FlashcardPage from './pages/Flashcards/FlashcardPage';
+import QuizTakePage from './pages/Quiz/QuizTakePage';
+import QuizResultpage from './pages/Quiz/QuizResultPage';
+import ProfilePage from './pages/Profile/ProfilePage';
+import LoginPage from './pages/Auth/LoginPage';
+import RegisterPage from './pages/Auth/RegisterPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import { useAuth } from './context/AuthContext';
 
 
 const App = () => {
-  const isAuthenticated = false
-  const loading = false
+  const {isAuthenticated, loading} = useAuth();
 
   if(loading) {
     return (
