@@ -88,7 +88,7 @@ const DocumentDetailPage = () => {
   };
 
   const renderAIActions = () => {
-    return "renderAIActions"
+    return <AIActions />
   };
 
   const renderFlashcardsTab = () => {
